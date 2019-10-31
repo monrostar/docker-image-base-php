@@ -11,8 +11,6 @@ RUN yum -y update && \
     # sysctl -w kernel.msgmnb=16777216 && \
     yum -y install zip unzip gcc gcc-c++ make openssl-devel linux-headers libevent-devel git
 
-RUN curl -sL https://rpm.nodesource.com/setup_10.x
-
 RUN yum -y --setopt=tsflags=nodocs update && \
     yum -y --setopt=tsflags=nodocs --nogpgcheck install epel-release zip unzip && \
     yum -y --setopt=tsflags=nodocs --nogpgcheck install https://centos7.iuscommunity.org/ius-release.rpm && \
@@ -41,9 +39,6 @@ RUN yum -y --setopt=tsflags=nodocs update && \
         nginx \
         cronie \
         yum clean all;
-
-
-RUN node -v && npm -v
 
 RUN mkdir -p /tmp \
     && php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" \
