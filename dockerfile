@@ -1,47 +1,34 @@
-FROM centos:7.5.1804
+FROM debian:9.12
 
-RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && \
-        yum clean all && yum makecache fast && \
-        yum install -y gcc-c++ make && \
-        yum install -y nodejs
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN yum -y update && \
-    # Sysvmsg; msgmax = 8MB; msgmnb = 16MB;
-    # sysctl -w kernel.msgmax=8388608 && \
-    # sysctl -w kernel.msgmnb=16777216 && \
-    yum -y install zip unzip gcc gcc-c++ make openssl-devel linux-headers libevent-devel git
+RUN apt update
+RUN apt -y install lsb-release apt-transport-https ca-certificates wget
+RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
+RUN apt update
+RUN apt-get -y install \
+      php7.4 \
+      php7.4-common \
+      php7.4-fpm \
+      php7.4-cli \
+      php7.4-bcmath \
+      php7.4-gd \
+      php7.4-intl \
+      php7.4-zip \
+      php7.4-json \
+      php7.4-ldap \
+      php7.4-mbstring \
+      php7.4-opcache \
+      php7.4-redis \
+      php7.4-xml \
+      php7.4-xmlrpc \
+      php7.4-gmp \
+      php7.4-posix \
+      php7.4-pdo \
+      php7.4-mysqlnd \
+      nginx \
+      cron \
+      && apt-get -y install python2-pip && pip install supervisor
 
-RUN yum -y --setopt=tsflags=nodocs update && \
-    yum -y --setopt=tsflags=nodocs --nogpgcheck install epel-release zip unzip && \
-    yum -y --setopt=tsflags=nodocs --nogpgcheck install https://centos7.iuscommunity.org/ius-release.rpm && \
-    yum -y --setopt=tsflags=nodocs --nogpgcheck install php72u-common \
-        php72u-fpm \
-        php72u-devel \
-        php72u-cli \
-        php72u-bcmath \
-        php72u-gd \
-        php72u-intl \
-        php72u-zip \
-        php72u-json \
-        php72u-ldap  \
-        php72u-mbstring \
-        php72u-opcache \
-        php72u-pecl-redis \
-        php72u-xml \
-        php72u-xmlrpc \
-        php72u-gmp \
-        php72u-posix \
-        php72u-pdo \
-        php72u-mysqlnd \
-        git \
-        python2-pip \
-        pip install supervisor \
-        nginx \
-        cronie \
-        yum clean all;
-
-RUN mkdir -p /tmp \
-    && php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" \
-    && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/bin --filename=composer  \
-    && composer --no-interaction global require 'hirak/prestissimo' \
-    && rm -rf /tmp/composer-setup.php /tmp/.htaccess
+COPY --from=composer:1.9.3 /usr/bin/composer /usr/bin/composer
