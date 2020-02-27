@@ -29,6 +29,7 @@ RUN apt-get -y install \
       php7.4-mysqlnd \
       nginx \
       cron \
-      supervisor
+      supervisor \
+      unzip
 
 COPY --from=composer:1.9.3 /usr/bin/composer /usr/bin/composer
