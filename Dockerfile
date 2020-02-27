@@ -29,6 +29,6 @@ RUN apt-get -y install \
       php7.4-mysqlnd \
       nginx \
       cron \
-      && apt-get -y install python2-pip && pip install supervisor
+      supervisor
 
 COPY --from=composer:1.9.3 /usr/bin/composer /usr/bin/composer
